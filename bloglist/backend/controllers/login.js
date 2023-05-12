@@ -18,7 +18,7 @@ loginRouter.post('/', async (req, res) => {
         username: returnedUser.username,
         id: returnedUser._id,
       },
-      process.env.SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: 60 * 60 },
     )
     res.status(200).send({
