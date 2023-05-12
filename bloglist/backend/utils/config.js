@@ -11,6 +11,8 @@ if (process.env.NODE_ENV === 'test') {
   MONGODB_URI = process.env.TEST_MONGODB_URI
 }
 
+const DATABASE_URL = process.env.DATABASE_URL || undefined
+
 const PORT = process.env.PORT || 8080
 
-module.exports = { PORT, MONGODB_URI }
+module.exports = { PORT, MONGODB_URI, DATABASE_URL }
