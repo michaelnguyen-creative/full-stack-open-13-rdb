@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  bloglist-frontend:
+    image: fso/bloglist-frontend
+    build:
+      context: ./client
+      dockerfile: ./Dockerfile
+    container_name: fso_bloglist_frontend
+  bloglist-backend:
+    image: fso/bloglist-backend
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+    container_name: fso_bloglist_backend
+    # env_file:
+    #   - ./server/.env
+    environment:
+      BACKEND_SECRETS_FILE: /run/secrets/backend-secrets
+    secrets:
+      - backend-secrets
+  reverse-proxy-server:
+    image: nginx:1.23.4-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - bloglist-frontend
+      - bloglist-backend
+  debugger:
+    image: busybox
+    container_name: buxybox_debugger
+
+secrets:
+  backend-secrets:
+    file: ./server/.env
