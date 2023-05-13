@@ -24,7 +24,7 @@ mongoose
 
 sequelize
   .authenticate()
-  .then(() => console.log('Connection to PostgresDB has been established'))
+  .then(() => console.log('Connected to Postgres at', config.DATABASE_URL))
   .catch((error) => console.log('Postgres connection errror:', error.message))
 
 app.use(cors())
