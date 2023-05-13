@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for fso13-bloglist-backend on 2023-05-12T17:54:10+07:00
+# fly.toml app configuration file generated for fso13-bloglist-backend on 2023-05-13T12:04:06+07:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -8,15 +8,15 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 primary_region = "sin"
 
-[processes]
-  app = "node index.js"
-
 [build]
 
 [env]
 
 [experimental]
   auto_rollback = true
+
+[processes]
+  app = "node index.js"
 
 [[services]]
   http_checks = []
