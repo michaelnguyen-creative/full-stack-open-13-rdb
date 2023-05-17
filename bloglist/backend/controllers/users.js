@@ -1,8 +1,13 @@
 const bcrypt = require('bcrypt')
-const usersRouter = require('express').Router()
-const User = require('../mongo/models/user')
+const userRouter = require('express').Router()
+const User = require('../postgres/models')
 
-usersRouter.post('/', async (req, res) => {
+userRouter.get('/', async (req, res) => {
+  const users = await User.findAll()
+  res.status(200).json(users)
+})
+
+userRouter.post('/', async (req, res) => {
   const { username, name, password } = req.body
 
   // Password validation
@@ -11,27 +16,24 @@ usersRouter.post('/', async (req, res) => {
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
-    const user = new User({
+    const user = User.build({
       username,
       name,
       passwordHash,
-    // process password, generate password hashes
-    // which will be saved to the database
-    // Use bcrypt library to implement hash function
-    // This is for user authentication purpose
     })
-    const savedUser = await user.save()
+    const newUser = await user.save()
 
-    res.status(201).json(savedUser)
+    res.status(201).json(newUser)
   } else {
     res.status(400).send({ error: 'password must be at least 3 characters long' })
   }
 })
 
-usersRouter.get('/', async (req, res) => {
-  const allUsers = await User
-    .find({}).populate('blogs', { title: 1, author: 1, url: 1, likes: 1 })
-  res.status(200).json(allUsers)
+userRouter.put('/users/:username', async (req, res) => {
+  const user = await User.findByPk(req.params.username)
+  user.username = req.body.username
+  await user.save()
+  res.status(200).json(user)
 })
 
-module.exports = usersRouter
+module.exports = userRouter

@@ -1,5 +1,5 @@
 const blogsRouter = require('express').Router()
-const Blog = require('../postgres/blog')
+const Blog = require('../postgres/models')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
@@ -33,21 +33,30 @@ blogsRouter.post('/', async (req, res) => {
   return res.status(201).json(savedBlog)
 })
 
+const findBlog = async (req, _res, next) => {
+  const blog = await Blog.findByPk(req.params?.id)
+  req.blog = blog
+  next()
+}
 // Delete by ID functionality
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id', findBlog, async (req, res) => {
   // if (req.token === null || req.user === null) {
   //   return res.status(401).send({ error: 'invalid user/token' })
   // }
-
-  await Blog.destroy({ where: { id: req.params.id } })
-  return res.status(204).end()
+  if (req.blog) {
+    await req.blog.destroy()
+    return res.status(204).end()
+  }
 })
 
-// Update amount of likes by ID
-// blogsRouter.put('/:id', async (req, res) => {
-//   const { likes } = req.body
-//   await Blog.findByIdAndUpdate(req.params.id, { likes }, { new: true })
-//   res.status(200).end()
-// })
+blogsRouter.put('/:id', findBlog, async (req, res) => {
+  if (req.blog) {
+    req.blog.likes = req.body?.likes
+    await req.blog.save()
+    res.json(req.blog)
+  } else {
+    res.status(404).end()
+  }
+})
 
 module.exports = blogsRouter
