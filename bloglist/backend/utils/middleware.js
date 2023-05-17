@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/user')
+const User = require('../mongo/models/user')
 
 const tokenExtractor = (req, res, next) => {
   const authz = req.get('authorization')
