@@ -9,7 +9,12 @@ module.exports = sequelize.define('User', {
   },
   username: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      isEmail: {
+        msg: 'Invalid username email'
+      }
+    }
   },
   name: {
     type: DataTypes.TEXT,

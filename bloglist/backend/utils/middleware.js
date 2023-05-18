@@ -50,7 +50,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'invalid token',
       detail: err.message,
     })
-  } else if (err.name === 'TypeError') {
+  } else if (err.name === 'SequelizeValidationError') {
     res.status(400).json({
       error: err.message,
     })
