@@ -34,17 +34,16 @@ const unknownEndpoint = (req, res, next) => {
 }
 
 const errorHandler = (error, req, res, next) => {
-  if (error.name === 'SequelizeValidationError') {
+  if (['SequelizeValidationError', 'BadUserInputError'].includes(error.name)) {
     res.status(400).send({
       error: error.message,
     })
-  } else if (error.name === 'JsonWebTokenError') {
+  } else if (
+    ['JsonWebTokenError', 'AuthenticationError'].includes(error.name)
+  ) {
     res.status(401).send({
-      error: 'invalid token',
-      detail: error.message,
+      error: error.message,
     })
-  } else if (error.name === 'AuthenticationError') {
-    res.status(401).send({ error: error.message })
   } else {
     res.status(500).send({ error })
   }

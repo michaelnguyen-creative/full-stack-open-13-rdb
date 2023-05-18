@@ -5,4 +5,10 @@ class AuthenticationError extends Error {
   }
 }
 
-module.exports = { AuthenticationError }
+class BadUserInputError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'BadUserInputError'
+  }
+}
+module.exports = { AuthenticationError, BadUserInputError }
