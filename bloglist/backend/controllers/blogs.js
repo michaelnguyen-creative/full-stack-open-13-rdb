@@ -1,5 +1,6 @@
 const blogsRouter = require('express').Router()
 const { Blog } = require('../postgres/models')
+const { AuthenticationError } = require('../utils/error')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
@@ -8,29 +9,21 @@ blogsRouter.get('/', async (req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   const { title, author, url, likes } = req.body
+  if (!req.user) throw new AuthenticationError("Invalid user")
 
-  if (title === '' || url === '') {
-    res.status(400).send({ error: 'Missing title and/or URL' })
-  }
-  // else if (req.token === null) {
-  //   return res.status(401).send({ error: 'token missing' })
-  // }
-
-  // const user = await User.findById(req.user._id)
   const blog = Blog.build({
     title,
     author,
     url,
     likes,
-    // DO this, refer to Mongo document by _id
-    // user: req.user._id,
+    userId: req.user.id
   })
-  const savedBlog = await blog.save()
+  await blog.save()
 
   // user.blogs = user.blogs.concat(savedBlog._id)
   // await user.save()
 
-  return res.status(201).json(savedBlog)
+  return res.status(201).json(blog)
 })
 
 const findBlog = async (req, _res, next) => {
@@ -38,11 +31,12 @@ const findBlog = async (req, _res, next) => {
   req.blog = blog
   next()
 }
-// Delete by ID functionality
+
 blogsRouter.delete('/:id', findBlog, async (req, res) => {
-  // if (req.token === null || req.user === null) {
-  //   return res.status(401).send({ error: 'invalid user/token' })
-  // }
+  if (!req.token || !req.user) {
+    throw new AuthenticationError('Invalid token or user')
+  }
+
   if (req.blog) {
     await req.blog.destroy()
     return res.status(204).end()
