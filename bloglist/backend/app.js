@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(middleware.tokenExtractor)
 
 app.use('/blogs', blogsRouter)
-app.use('/users', usersRouter)
+app.use('/api/users', usersRouter)
 app.use('/login', loginRouter)
 
 if (process.env.NODE_ENV === 'test') {

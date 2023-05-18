@@ -4,7 +4,7 @@ const app = require('./app')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
 const { testConnectionPostgres } = require('./postgres/init')
-const connectToMongo = require('./mongo/init')
+const { connectToMongo } = require('./mongo/init')
 
 const server = http.createServer(app)
 

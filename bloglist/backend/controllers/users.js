@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const userRouter = require('express').Router()
-const User = require('../postgres/models')
+const { User } = require('../postgres/models')
 
 userRouter.get('/', async (req, res) => {
   const users = await User.findAll()
@@ -25,7 +25,9 @@ userRouter.post('/', async (req, res) => {
 
     res.status(201).json(newUser)
   } else {
-    res.status(400).send({ error: 'password must be at least 3 characters long' })
+    res
+      .status(400)
+      .send({ error: 'password must be at least 3 characters long' })
   }
 })
 

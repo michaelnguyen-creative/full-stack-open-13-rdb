@@ -1,5 +1,5 @@
 const blogsRouter = require('express').Router()
-const Blog = require('../postgres/models')
+const { Blog } = require('../postgres/models')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
