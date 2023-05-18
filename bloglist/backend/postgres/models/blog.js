@@ -20,7 +20,7 @@ module.exports = sequelize.define('Blog', {
     allowNull: false,
   },
   likes: {
-    type: DataTypes.TEXT,
-    allowNull: false,
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
 })
