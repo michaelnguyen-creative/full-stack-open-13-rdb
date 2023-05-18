@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../mongo/models/user')
+const { User } = require('../postgres/models')
 
 const tokenExtractor = (req, res, next) => {
   const authz = req.get('authorization')
@@ -15,19 +15,15 @@ const tokenExtractor = (req, res, next) => {
 }
 
 const userExtractor = async (req, res, next) => {
-  if (req.token === undefined || req.token === null) {
-    return next()
-  }
+  if (!req.token) return next()
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
-  const returnedUser = await User.findById(decodedToken.id)
-
-  if (returnedUser._id.toString() === decodedToken.id) {
+  const decoded = jwt.verify(req.token, process.env.JWT_SECRET)
+  const returnedUser = await User.findByPk(decoded.id)
+  if (returnedUser.id === decoded.id) {
     req.user = returnedUser
   } else {
     req.user = null
   }
-
   return next()
 }
 
@@ -37,26 +33,23 @@ const unknownEndpoint = (req, res, next) => {
   return next()
 }
 
-const errorHandler = (err, req, res, next) => {
-  if (err.name === 'CastError') {
+const errorHandler = (error, req, res, next) => {
+  if (error.name === 'SequelizeValidationError') {
     res.status(400).send({
-      error: 'malformatted id',
-      detail: err.message,
+      error: error.message,
     })
-  } else if (err.name === 'ValidationError') {
-    res.status(400).json({ error: err.message })
-  } else if (err.name === 'JsonWebTokenError') {
+  } else if (error.name === 'JsonWebTokenError') {
     res.status(401).send({
       error: 'invalid token',
-      detail: err.message,
+      detail: error.message,
     })
-  } else if (err.name === 'SequelizeValidationError') {
-    res.status(400).json({
-      error: err.message,
-    })
+  } else if (error.name === 'AuthenticationError') {
+    res.status(401).send({ error: error.message })
+  } else {
+    res.status(500).send({ error })
   }
 
-  return next(err)
+  return next(error)
 }
 
 module.exports = {
