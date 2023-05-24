@@ -112,7 +112,6 @@ describe('deleting a blog by id', () => {
   test('logged in user & valid id returns 204 No Content', async () => {
     const blogs = await helper.getAllBlogs()
     const validFirstId = blogs[0].id
-    console.log('valid id:', validFirstId)
 
     const respond = await api.post('/api/login').send(seedData.users[0])
 
@@ -135,10 +134,11 @@ describe('deleting a blog by id', () => {
 
 describe('updating a blog api', () => {
   test('updating a valid id returns 200 OK', async () => {
-    const validId = await helper.getFirstValidId()
+    const blogs = await helper.getAllBlogs()
+    const validFirstId = blogs[0].id
     const likesToUpdate = { likes: 40 }
 
-    await api.put(`/api/blogs/${validId}`).send(likesToUpdate).expect(200)
+    await api.put(`/api/blogs/${validFirstId}`).send(likesToUpdate).expect(200)
   })
 })
 
