@@ -20,7 +20,7 @@ beforeEach(async () => {
   await User.create({
     username: firstUser.username,
     name: firstUser.name,
-    passwordHash
+    passwordHash,
   })
 })
 
@@ -45,10 +45,7 @@ describe('adding a new blog api', () => {
       likes: 100,
     }
 
-    const res = await api
-      .post('/api/login')
-      .send(seedData.users[0])
-      .expect(200)
+    const res = await api.post('/api/login').send(seedData.users[0]).expect(200)
 
     const token = res.body.token
     console.log('token', token)
@@ -70,9 +67,7 @@ describe('adding a new blog api', () => {
       url: 'https://en.wikipedia.org/wiki/Murphy%27s_law',
     }
 
-    const respond = await api
-      .post('/api/login')
-      .send(seedData.users[0])
+    const respond = await api.post('/api/login').send(seedData.users[0])
 
     const res = await api
       .post('/api/blogs')
@@ -88,9 +83,7 @@ describe('adding a new blog api', () => {
       author: 'Wiki',
       likes: 22,
     }
-    const respond = await api
-      .post('/api/login')
-      .send(seedData.users[0])
+    const respond = await api.post('/api/login').send(seedData.users[0])
 
     await api
       .post('/api/blogs')
@@ -116,15 +109,27 @@ describe('adding a new blog api', () => {
 })
 
 describe('deleting a blog by id', () => {
-  test('valid id returns 204 No Content', async () => {
-    const validId = await helper.getFirstValidId()
-    console.log('valid id:', validId)
-    await api.delete(`/api/blogs/${validId}`).expect(204)
+  test('logged in user & valid id returns 204 No Content', async () => {
+    const blogs = await helper.getAllBlogs()
+    const validFirstId = blogs[0].id
+    console.log('valid id:', validFirstId)
+
+    const respond = await api.post('/api/login').send(seedData.users[0])
+
+    await api
+      .delete(`/api/blogs/${validFirstId}`)
+      .auth(respond.body.token, { type: 'bearer' })
+      .expect(204)
   })
 
-  test('invalid id returns 400 Bad Request', async () => {
+  test('logged in user & invalid id returns 400 Bad Request', async () => {
     const invalidId = 'dfad9dfad0dfadfad'
-    await api.delete(`/api/blogs/${invalidId}`).expect(400)
+    const respond = await api.post('/api/login').send(seedData.users[0])
+
+    await api
+      .delete(`/api/blogs/${invalidId}`)
+      .auth(respond.body.token, { type: 'bearer' })
+      .expect(400)
   })
 })
 
