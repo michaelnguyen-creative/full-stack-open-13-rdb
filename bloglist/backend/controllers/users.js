@@ -1,9 +1,16 @@
 const bcrypt = require('bcrypt')
 const userRouter = require('express').Router()
-const { User } = require('../postgres/models')
+const { User, Blog } = require('../postgres/models')
 
 userRouter.get('/', async (req, res) => {
-  const users = await User.findAll()
+  const users = await User.findAll({
+    include: {
+      model: Blog,
+      attributes: {
+        exclude: ['id', 'UserId']
+      }
+    }
+  })
   res.status(200).json(users)
 })
 

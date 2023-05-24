@@ -1,48 +1,35 @@
 const supertest = require('supertest')
-const bcrypt = require('bcrypt')
-const mongoose = require('mongoose')
 const app = require('../app')
-const User = require('../models/user')
-const { getAllUsers } = require('./test_helper')
-// const helper = require('./user_helper')
+const { getAllUsers, setupDb } = require('../utils/testHelper')
+const seedData = require('../postgres/seed')
 
 const api = supertest(app)
 
 beforeEach(async () => {
-  // Query with model
-  await User.deleteMany({})
+  await setupDb()
+})
 
-  // Save new document with document
-  const passwordHash = await bcrypt.hash('t6st-p@ssw0rd', 10)
-  const user = new User({
-    username: 'test-admin',
-    name: 'admin',
-    passwordHash,
+describe('GET /api/users', () => {
+  test('returns a 200 OK & users are returned as JSON', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
   })
-  await user.save()
+  test('each user shows the blogs they created', async () => {
+    const res = await api.get('/api/users')
+    expect(res.body[0].Blogs).toMatchObject(seedData.blogs)
+  })
 })
 
-test('successfully create a new user with status code 201', async () => {
-  const newUser = {
-    username: 'michael-ng',
-    name: 'Michael Nguyen',
-    password: 'm1ch@3l',
-  }
-
-  await api
-    .post('/api/users')
-    .send(newUser)
-    .expect(201)
-})
-
-test('get all users returns a 200 OK & users are returned as JSON', async () => {
-  await api
-    .get('/api/users')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
 
 describe('user creation validators', () => {
+  test('successfully create a new user with status code 201', async () => {
+    await api
+      .post('/api/users')
+      .send(seedData.users[1])
+      .expect(201)
+  })
   test('invalid users will not be created, status code 400 & proper error message returned', async () => {
     const invalidUsers = [
       {
@@ -86,8 +73,4 @@ describe('user creation validators', () => {
       .send(validUser)
       .expect(201)
   })
-})
-
-afterAll(() => {
-  mongoose.connection.close()
 })

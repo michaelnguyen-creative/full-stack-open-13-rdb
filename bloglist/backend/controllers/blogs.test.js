@@ -14,10 +14,12 @@ describe('getting all blogs api', () => {
     await api.get('/api/blogs').expect('Content-Type', /application\/json/)
   })
 
-  // test('blogs _id prop are replaced by id', async () => {
-  //   const blogs = await api.get('/api/blogs')
-  //   expect(blogs.body.map((b) => b.id)).toBeDefined()
-  // })
+  test.only('each blog displays the user who created it', async () => {
+    const res = await api.get('/api/blogs')
+    res.body.forEach((item) => {
+      expect(item).toMatchObject({ User: { name: seedData.users[0].name }})
+    })
+  })
 })
 
 describe('adding a new blog api', () => {

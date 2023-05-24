@@ -1,9 +1,18 @@
 const blogsRouter = require('express').Router()
-const { Blog } = require('../postgres/models')
+const { Blog, User } = require('../postgres/models')
 const { AuthenticationError } = require('../utils/error')
 
-blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.findAll()
+blogsRouter.get('/', async (_req, res) => {
+  const blogs = await Blog.findAll({
+    attributes: {
+      exclude: ['UserId']
+    },
+    include:
+    {
+      model: User,
+      attributes: ['name']
+    }
+  })
   res.json(blogs)
 })
 
@@ -16,14 +25,11 @@ blogsRouter.post('/', async (req, res) => {
     author,
     url,
     likes,
-    userId: req.user.id,
+    UserId: req.user.id,
   })
   const newBlog = await blog.save()
 
-  req.user.blogs = req.user.blogs.concat(newBlog.id)
-  await user.save()
-
-  return res.status(201).json(blog)
+  res.status(201).json(newBlog)
 })
 
 const findBlog = async (req, _res, next) => {
