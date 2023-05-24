@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { User } = require('../postgres/models')
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = (req, _res, next) => {
   const authz = req.get('authorization')
   // console.log('authz', authz)
   if (authz && authz.toLowerCase().startsWith('bearer')) {
@@ -27,14 +27,19 @@ const userExtractor = async (req, res, next) => {
   return next()
 }
 
-const unknownEndpoint = (req, res, next) => {
+const unknownEndpoint = (_req, res, next) => {
   res.status(404).send({ error: 'unknown endpoint' })
-
   return next()
 }
 
 const errorHandler = (error, req, res, next) => {
-  if (['SequelizeValidationError', 'BadUserInputError'].includes(error.name)) {
+  if (
+    [
+      'SequelizeValidationError',
+      'BadUserInputError',
+      'SequelizeDatabaseError',
+    ].includes(error.name)
+  ) {
     res.status(400).send({
       error: error.message,
     })
