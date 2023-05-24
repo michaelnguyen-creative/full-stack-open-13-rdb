@@ -1,6 +1,6 @@
 const blogsRouter = require('express').Router()
 const { Blog } = require('../postgres/models')
-const { AuthenticationError } = require('../utils/error')
+const { AuthenticationError, BadUserInputError } = require('../utils/error')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
@@ -9,14 +9,14 @@ blogsRouter.get('/', async (req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   const { title, author, url, likes } = req.body
-  if (!req.user) throw new AuthenticationError("Invalid user")
+  if (!req.user) throw new AuthenticationError('Invalid user')
 
   const blog = Blog.build({
     title,
     author,
     url,
     likes,
-    userId: req.user.id
+    userId: req.user.id,
   })
   await blog.save()
 
@@ -28,7 +28,11 @@ blogsRouter.post('/', async (req, res) => {
 
 const findBlog = async (req, _res, next) => {
   const blog = await Blog.findByPk(req.params?.id)
-  req.blog = blog
+  if (!blog) {
+    throw new BadUserInputError('Blog not found')
+  } else {
+    req.blog = blog
+  }
   next()
 }
 
@@ -37,10 +41,8 @@ blogsRouter.delete('/:id', findBlog, async (req, res) => {
     throw new AuthenticationError('Invalid token or user')
   }
 
-  if (req.blog) {
-    await req.blog.destroy()
-    return res.status(204).end()
-  }
+  await req.blog.destroy()
+  res.status(204).end()
 })
 
 blogsRouter.put('/:id', findBlog, async (req, res) => {
