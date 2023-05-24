@@ -1,27 +1,12 @@
 const supertest = require('supertest')
-const bcrypt = require('bcrypt')
-const { sequelize } = require('../postgres/init')
 const app = require('../app')
-const { Blog, User } = require('../postgres/models')
 const helper = require('../utils/testHelper')
 const seedData = require('../postgres/seed')
 
 const api = supertest(app)
 
 beforeEach(async () => {
-  // Blog database prep
-  await Blog.destroy({ truncate: true })
-  await Blog.bulkCreate(seedData.blogs)
-
-  // User database prep
-  await User.destroy({ truncate: true })
-  const firstUser = helper.getFirstItem(seedData.users)
-  const passwordHash = await bcrypt.hash(firstUser.password, 10)
-  await User.create({
-    username: firstUser.username,
-    name: firstUser.name,
-    passwordHash,
-  })
+  await helper.setupDb()
 })
 
 describe('getting all blogs api', () => {
@@ -140,8 +125,4 @@ describe('updating a blog api', () => {
 
     await api.put(`/api/blogs/${validFirstId}`).send(likesToUpdate).expect(200)
   })
-})
-
-afterAll(() => {
-  sequelize.close()
 })
