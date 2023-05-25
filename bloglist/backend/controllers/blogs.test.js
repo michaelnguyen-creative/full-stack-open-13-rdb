@@ -9,15 +9,29 @@ beforeEach(async () => {
   await helper.setupDb()
 })
 
-describe('getting all blogs api', () => {
+describe('GET /api/blogs', () => {
   test('blogs are returned as json', async () => {
     await api.get('/api/blogs').expect('Content-Type', /application\/json/)
   })
 
-  test.only('each blog displays the user who created it', async () => {
+  test('each blog displays the user who created it', async () => {
     const res = await api.get('/api/blogs')
     res.body.forEach((item) => {
-      expect(item).toMatchObject({ User: { name: seedData.users[0].name }})
+      expect(item).toMatchObject({ User: { name: seedData.users[0].name } })
+    })
+  })
+
+  describe('query string', () => {
+    test('with "?search=react" returns all blogs, which title includes case-insensitive "react" search keyword', async () => {
+      const res = await api.get('/api/blogs?search=react')
+      // console.log('res', JSON.stringify(res.body), res.statusCode)
+      res.body.forEach(({ title }) => {
+        expect(title).toMatch(/react/i)
+      })
+    })
+    test.only('', async () => {
+      const res = await api.get('/api/blogs')
+      console.log('res', res)
     })
   })
 })

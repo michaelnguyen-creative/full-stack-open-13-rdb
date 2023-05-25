@@ -40,7 +40,7 @@ const errorHandler = (error, req, res, next) => {
       'SequelizeDatabaseError',
     ].includes(error.name)
   ) {
-    res.status(400).send({
+    res.status(400).json({
       error: error.message,
     })
   } else if (
@@ -50,7 +50,7 @@ const errorHandler = (error, req, res, next) => {
       error: error.message,
     })
   } else {
-    res.status(500).send({ error })
+    res.status(500).json({ error: error.message })
   }
 
   return next(error)
