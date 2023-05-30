@@ -42,6 +42,16 @@ describe('GET /api/blogs', () => {
       expect(res.body).toHaveLength(filteredBlogs.length)
     })
   })
+  test('returns all blogs as JSON in descending order of likes', async () => {
+    const response = await api.get('/api/blogs').expect(200).expect('Content-Type', /application\/json/)
+    const blogs = response.body
+    expect(blogs).toHaveLength(seedData.blogs.length)
+    for (let i = 0; i < blogs.length - 1; i++) {
+      expect(blogs[i].likes).toBeGreaterThanOrEqual(blogs[i + 1].likes)
+    }
+    const sortedBlogs = blogs.slice().sort((a, b) => b.likes - a.likes)
+    expect(blogs).toEqual(sortedBlogs)
+  })
 })
 
 describe('POST /api/blogs', () => {
