@@ -10,8 +10,9 @@ beforeEach(async () => {
 })
 
 describe('GET /api/blogs', () => {
-  test('blogs are returned as json', async () => {
-    await api.get('/api/blogs').expect('Content-Type', /application\/json/)
+  test('returns all blogs as JSON', async () => {
+    const response = await api.get('/api/blogs').expect(200).expect('Content-Type', /application\/json/)
+    expect(response.body).toHaveLength(seedData.blogs.length)
   })
 
   test('each blog displays the user who created it', async () => {
@@ -21,22 +22,29 @@ describe('GET /api/blogs', () => {
     })
   })
 
-  describe('query string', () => {
-    test('with "?search=react" returns all blogs, which title includes case-insensitive "react" search keyword', async () => {
+  describe('with query string', () => {
+    test('returns all blogs, which title includes case-insensitive "react" search keyword', async () => {
       const res = await api.get('/api/blogs?search=react')
       // console.log('res', JSON.stringify(res.body), res.statusCode)
       res.body.forEach(({ title }) => {
         expect(title).toMatch(/react/i)
       })
     })
-    test.only('', async () => {
-      const res = await api.get('/api/blogs')
-      console.log('res', res)
+    test('returns blogs with keyword in either title or author', async () => {
+      const query = 'ar'
+      const res = await api.get(`/api/blogs?search=${query}`)
+      const filteredBlogs = seedData.blogs.filter(
+        (blog) =>
+          blog.title.toLowerCase().includes(query) ||
+          blog.author.toLowerCase().includes(query)
+      )
+
+      expect(res.body).toHaveLength(filteredBlogs.length)
     })
   })
 })
 
-describe('adding a new blog api', () => {
+describe('POST /api/blogs', () => {
   test('new blog is created with valid token', async () => {
     const initialBlogs = await helper.getAllBlogs()
     const newBlog = {
@@ -76,7 +84,7 @@ describe('adding a new blog api', () => {
       .send(newBlog)
       .expect(201)
     // Keep it simple, stupid (KISS principle)
-    expect(res.body).toMatchObject({ likes: '0' })
+    expect(res.body).toMatchObject({ likes: 0 })
   })
 
   test('create a new blog without title & url will return a 400 Bad Request status code', async () => {
@@ -109,7 +117,7 @@ describe('adding a new blog api', () => {
   })
 })
 
-describe('deleting a blog by id', () => {
+describe('DELETE /api/blogs/:id', () => {
   test('logged in user & valid id returns 204 No Content', async () => {
     const blogs = await helper.getAllBlogs()
     const validFirstId = blogs[0].id
@@ -133,7 +141,8 @@ describe('deleting a blog by id', () => {
   })
 })
 
-describe('updating a blog api', () => {
+
+describe('UPDATE /api/blogs/:id', () => {
   test('updating a valid id returns 200 OK', async () => {
     const blogs = await helper.getAllBlogs()
     const validFirstId = blogs[0].id
