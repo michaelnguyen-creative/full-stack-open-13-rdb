@@ -8,9 +8,13 @@ const { connectToPostgres } = require('./postgres/init')
 
 const server = http.createServer(app)
 
-connectToPostgres()
-connectToMongo()
+const startServer = async () => {
+  await connectToPostgres()
+  await connectToMongo()
 
-server.listen(config.PORT, () => {
-  logger.info(`Server is running on port ${config.PORT}`)
-})
+  server.listen(config.PORT, () => {
+    logger.info(`Server is running on port ${config.PORT}`)
+  })
+}
+
+startServer()
