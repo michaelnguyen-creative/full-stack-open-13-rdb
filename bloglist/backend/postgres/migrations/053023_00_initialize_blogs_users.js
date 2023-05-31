@@ -78,7 +78,7 @@ module.exports = {
         });
     },
 
-    down: async (queryInterface, Sequelize) => {
+    down: async ({ context: queryInterface }) => {
         await queryInterface.dropTable('blogs');
         await queryInterface.dropTable('users');
     }
