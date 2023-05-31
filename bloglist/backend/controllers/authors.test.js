@@ -1,7 +1,13 @@
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
+
 const testHelper = require('../utils/testHelper')
+const { sequelize, connectToPostgres } = require('../postgres/init')
+
+beforeAll(async () => {
+    await connectToPostgres()
+})
 
 beforeEach(async () => {
     await testHelper.setupDb()
@@ -17,6 +23,10 @@ describe('GET /api/authors', () => {
             { author: 'Edsger W. Dijkstra', articles: '2', likes: '17' },
             { author: 'Robert C. Martin', articles: '3', likes: '12' },
             { author: 'Michael Chan', articles: '1', likes: '7' }
-          ])
+        ])
     })
+})
+
+afterAll(() => {
+    sequelize.close()
 })

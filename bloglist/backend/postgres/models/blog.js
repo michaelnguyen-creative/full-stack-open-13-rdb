@@ -1,7 +1,7 @@
 const { sequelize } = require('../init')
 const { DataTypes, Model } = require('sequelize')
 
-class Blog extends Model {}
+class Blog extends Model { }
 
 module.exports = Blog.init({
   id: {
@@ -24,6 +24,15 @@ module.exports = Blog.init({
   likes: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
+  },
+  year: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1991,
+    validate: {
+      min: 1991,
+      max: new Date().getFullYear(),
+    },
   },
 }, {
   sequelize,

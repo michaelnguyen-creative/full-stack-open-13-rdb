@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt')
-
 const { Blog, User } = require('../postgres/models')
 const seedData = require('../postgres/seed')
 

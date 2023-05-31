@@ -1,9 +1,14 @@
 const supertest = require('supertest')
 const app = require('../app')
+const api = supertest(app)
+
 const helper = require('../utils/testHelper')
 const seedData = require('../postgres/seed')
+const { sequelize, connectToPostgres } = require('../postgres/init')
 
-const api = supertest(app)
+beforeAll(async () => {
+  await connectToPostgres()
+})
 
 beforeEach(async () => {
   await helper.setupDb()
@@ -12,6 +17,7 @@ beforeEach(async () => {
 describe('GET /api/blogs', () => {
   test('returns all blogs as JSON', async () => {
     const response = await api.get('/api/blogs').expect(200).expect('Content-Type', /application\/json/)
+    console.log('response.body', response.body);
     expect(response.body).toHaveLength(seedData.blogs.length)
   })
 
@@ -160,4 +166,8 @@ describe('UPDATE /api/blogs/:id', () => {
 
     await api.put(`/api/blogs/${validFirstId}`).send(likesToUpdate).expect(200)
   })
+})
+
+afterAll(() => {
+    sequelize.close()
 })

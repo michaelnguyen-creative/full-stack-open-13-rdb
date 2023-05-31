@@ -1,9 +1,14 @@
 const supertest = require('supertest')
 const app = require('../app')
+const api = supertest(app)
+
 const { getAllUsers, setupDb } = require('../utils/testHelper')
 const seedData = require('../postgres/seed')
+const { sequelize, connectToPostgres } = require('../postgres/init')
 
-const api = supertest(app)
+beforeAll(async () => {
+  await connectToPostgres()
+})
 
 beforeEach(async () => {
   await setupDb()
@@ -33,7 +38,7 @@ describe('user creation validators', () => {
   test('invalid users will not be created, status code 400 & proper error message returned', async () => {
     const invalidUsers = [
       {
-        username: 'test-admin',
+        username: 'test-admin@gmail.com',
         name: 'admin',
         password: 't3',
       },
@@ -55,22 +60,22 @@ describe('user creation validators', () => {
       .post('/api/users')
       .send(invalidUsers[1])
       .expect(400)
-    expect(resTwo.body.error).toMatch(/User validation failed: username: Error, expected `username` to be unique/)
+    expect(resTwo.body.error).toContain('Invalid username email')
 
     const allUsers = await getAllUsers()
     expect(allUsers).not.toContainEqual(invalidUsers)
   })
 
   test('valid users return 201 Created', async () => {
-    const validUser = {
-      username: 'bernido212',
-      name: 'Bernido',
-      password: '89@dhjgnk&',
-    }
+    const validUser = seedData.users[0]
 
     await api
       .post('/api/users')
       .send(validUser)
       .expect(201)
   })
+})
+
+afterAll(() => {
+    sequelize.close()
 })
