@@ -2,6 +2,8 @@ const { DataTypes, Sequelize } = require('sequelize');
 
 module.exports = {
     up: async ({ context: queryInterface }) => {
+        // Create a new users table
+        // Note: the id field is created automatically by Sequelize
         await queryInterface.createTable('users', {
             id: {
                 type: DataTypes.INTEGER,
@@ -33,6 +35,7 @@ module.exports = {
             }
         });
 
+        // Create a new blogs table
         await queryInterface.createTable('blogs', {
             id: {
                 type: DataTypes.INTEGER,
