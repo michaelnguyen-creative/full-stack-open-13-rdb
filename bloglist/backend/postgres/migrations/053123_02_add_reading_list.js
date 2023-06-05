@@ -2,13 +2,6 @@ const { DataTypes } = require('sequelize');
 
 module.exports = {
     up: async ({ context: queryInterface }) => {
-        // Add a new field to the Blogs table
-        await queryInterface.addColumn('blogs', 'read', {
-            allowNull: false,
-            defaultValue: false,
-            type: DataTypes.BOOLEAN
-        });
-
         // Create a new reading_list table
         await queryInterface.createTable('reading_list', {
             id: {
@@ -17,31 +10,36 @@ module.exports = {
                 autoIncrement: true,
                 primaryKey: true
             },
-            userId: {
+            read: {
+                allowNull: false,
+                defaultValue: false,
+                type: DataTypes.BOOLEAN
+            },
+            user_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'Users',
+                    model: 'users',
                     key: 'id'
                 },
                 onUpdate: 'CASCADE',
                 onDelete: 'CASCADE'
             },
-            blogId: {
+            blog_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'Blogs',
+                    model: 'blogs',
                     key: 'id'
                 },
                 onUpdate: 'CASCADE',
                 onDelete: 'CASCADE'
             },
-            createdAt: {
+            created_at: {
                 type: DataTypes.DATE,
                 allowNull: false
             },
-            updatedAt: {
+            updated_at: {
                 type: DataTypes.DATE,
                 allowNull: false
             }
@@ -51,8 +49,5 @@ module.exports = {
     down: async ({ context: queryInterface }) => {
         // Remove the reading_list table
         await queryInterface.dropTable('reading_list');
-
-        // Remove the read field from the Blogs table
-        await queryInterface.removeColumn('blogs', 'read');
     }
 };

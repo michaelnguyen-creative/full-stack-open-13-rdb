@@ -19,16 +19,16 @@ module.exports = {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            passwordHash: {
+            password_hash: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            createdAt: {
+            created_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            updatedAt: {
+            updated_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
@@ -60,7 +60,7 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 0
             },
-            userId: {
+            user_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
@@ -68,12 +68,12 @@ module.exports = {
                     key: 'id'
                 }
             },
-            createdAt: {
+            created_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
             },
-            updatedAt: {
+            updated_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
