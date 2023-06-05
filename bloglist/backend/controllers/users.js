@@ -1,17 +1,41 @@
 const bcrypt = require('bcrypt')
 const userRouter = require('express').Router()
-const { User, Blog } = require('../postgres/models')
+const { User, Blog, ReadingList } = require('../postgres/models')
 
+// Get all users route
 userRouter.get('/', async (req, res) => {
   const users = await User.findAll({
     include: {
       model: Blog,
       attributes: {
-        exclude: ['id', 'UserId']
+        exclude: ['id', 'userId']
       }
     }
   })
   res.status(200).json(users)
+})
+
+// Get single user route by id
+userRouter.get('/:id', async (req, res) => {
+  // Find user by id
+  const user = await User.findByPk(req.params?.id, {
+    // include reading list of blogs as readings
+    include: {
+      model: Blog,
+      as: 'readings',
+      attributes: {
+        exclude: ['id', 'userId', 'createdAt', 'updatedAt']
+      },
+      through: {
+        attributes: []
+      },
+  },
+    // exclude id & passwordHash & timestamp from user object
+    attributes: {
+      exclude: ['id', 'passwordHash', 'createdAt', 'updatedAt']
+    }
+  })
+  res.status(200).json(user)
 })
 
 userRouter.post('/', async (req, res) => {

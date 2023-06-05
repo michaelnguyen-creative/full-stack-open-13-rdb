@@ -24,7 +24,7 @@ describe('GET /api/blogs', () => {
   test('each blog displays the user who created it', async () => {
     const res = await api.get('/api/blogs')
     res.body.forEach((item) => {
-      expect(item).toMatchObject({ User: { name: seedData.users[0].name } })
+      expect(item.user).toMatchObject({ name: seedData.users[0].name })
     })
   })
 
