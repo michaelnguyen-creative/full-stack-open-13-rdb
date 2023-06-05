@@ -1,11 +1,13 @@
-const Blog = require('./blog')
-const User = require('./user')
-const ReadingList = require('./readingList')
+const Blog = require("./blog");
+const User = require("./user");
+const ReadingList = require("./readingList");
 
-User.hasMany(Blog)
-Blog.belongsTo(User)
+// Define relationships between models
+User.hasMany(Blog);
+Blog.belongsTo(User);
 
-User.belongsToMany(Blog, { through: ReadingList, as: 'blogs_read' })
-Blog.belongsToMany(User, { through: ReadingList, as: 'read_by_users' })
+// Define many-to-many relationship between User and Blog
+User.belongsToMany(Blog, { through: ReadingList, as: "readings" });
+Blog.belongsToMany(User, { through: ReadingList, as: 'readers' });
 
-module.exports = { Blog, User, ReadingList }
+module.exports = { Blog, User, ReadingList };
