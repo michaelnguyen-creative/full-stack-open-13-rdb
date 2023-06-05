@@ -27,19 +27,13 @@ module.exports = Blog.init({
   },
   year: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 1991,
     validate: {
       min: 1991,
       max: new Date().getFullYear(),
     },
-  },
-  read: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
   }
 }, {
   sequelize,
-  modelName: 'Blog'
+  underscored: true,
+  modelName: 'blog'
 })
