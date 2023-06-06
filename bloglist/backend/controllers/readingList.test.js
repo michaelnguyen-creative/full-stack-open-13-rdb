@@ -35,9 +35,9 @@ describe("POST /api/readingList", () => {
 describe("PUT /api/readinglists/:id", () => {
   test("returns 200 & updated read status", async () => {
     // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getBlogById(1);
+    const { id: blogId } = await testHelper.getFirstBlog();
     // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getUserById(1);
+    const { id: userId } = await testHelper.getFirstUser();
     // Making post request to /api/readingList with blogId and userId
     await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
 
@@ -48,7 +48,7 @@ describe("PUT /api/readinglists/:id", () => {
       .expect(200);
 
     // Get readingId from the first reading in the database
-    const { id: readingId } = await testHelper.getReadingById(1);
+    const { id: readingId } = await testHelper.getFirstReadingList();
     // Making put request to /api/readinglists/:id with readingId
     const updatedRes = await api
       .put(`/api/readinglists/${readingId}`)
@@ -59,16 +59,16 @@ describe("PUT /api/readinglists/:id", () => {
     expect(updatedRes.body.read).toBe(true);
   });
 
-  test.only("returns 401 & error message if user is not logged in", async () => {
+  test("returns 401 & error message if user is not logged in", async () => {
     // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getBlogById(1);
+    const { id: blogId } = await testHelper.getFirstBlog()
     // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getUserById(1);
+    const { id: userId } = await testHelper.getFirstUser()
     // Making post request to /api/readingList with blogId and userId
     await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
 
     // Get readingId from the first reading in the database
-    const { id: readingId } = await testHelper.getReadingById(1);
+    const { id: readingId } = await testHelper.getFirstReadingList();
     // Making put request to /api/readinglists/:id with readingId
     const updatedRes = await api
       .put(`/api/readinglists/${readingId}`)

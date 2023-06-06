@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",
-    "test": "NODE_ENV=test jest --forceExit --watch",
+    "test": "NODE_ENV=test jest --watchAll",
     "test:ci": "NODE_ENV=test jest --forceExit --watchAll=false",
     "start:test": "NODE_ENV=test node index.js",
     "connect:postgres": "fly proxy 15432:5432 -a fso13-bloglist-backend-db"

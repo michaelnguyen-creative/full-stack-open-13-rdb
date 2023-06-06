@@ -10,6 +10,8 @@ const getBlogById = async (id) => Blog.findByPk(id);
 const getReadingById = async (id) => ReadingList.findByPk(id);
 // implement getFirtUser from db
 const getFirstUser = async () => User.findOne();
+// implement getFirtBlog from db
+const getFirstBlog = async () => Blog.findOne();
 // implement getFirstReadingList from db
 const getFirstReadingList = async () => ReadingList.findOne();
 
@@ -69,6 +71,7 @@ module.exports = {
   getBlogById,
   getReadingById,
   getFirstUser,
+  getFirstBlog,
   getFirstReadingList,
   setupDb,
   insertIntoReadingList,

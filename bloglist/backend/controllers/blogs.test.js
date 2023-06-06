@@ -17,7 +17,7 @@ beforeEach(async () => {
 describe('GET /api/blogs', () => {
   test('returns all blogs as JSON', async () => {
     const response = await api.get('/api/blogs').expect(200).expect('Content-Type', /application\/json/)
-    console.log('response.body', response.body);
+    // console.log('response.body', response.body);
     expect(response.body).toHaveLength(seedData.blogs.length)
   })
 
