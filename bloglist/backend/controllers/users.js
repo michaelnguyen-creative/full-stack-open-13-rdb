@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const userRouter = require('express').Router()
-const { User, Blog, ReadingList } = require('../postgres/models')
+const { User, Blog } = require('../postgres/models')
 
 // Get all users route
 userRouter.get('/', async (req, res) => {
@@ -27,7 +27,7 @@ userRouter.get('/:id', async (req, res) => {
         exclude: ['id', 'userId', 'createdAt', 'updatedAt']
       },
       through: {
-        attributes: []
+        attributes: ['id', 'read']
       },
   },
     // exclude id & passwordHash & timestamp from user object

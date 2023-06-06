@@ -15,20 +15,12 @@ module.exports = ReadingList.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    blogId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    }
   },
   {
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "reading_list",
+    modelName: "readinglist",
   }
 );
