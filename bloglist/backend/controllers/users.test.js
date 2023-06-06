@@ -25,59 +25,110 @@ describe("GET /api/users", () => {
   test("each user shows the blogs they created", async () => {
     const res = await api.get("/api/users");
     // log res.body
-    console.log("res.body", res.body);
+    // console.log("res.body", res.body);
     expect(res.body[0].blogs).toMatchObject(data.blogs);
   });
 });
 
 // test individual user /api/users/:id endpoint
 describe("GET /api/users/:id", () => {
+  beforeEach(async () => {
+    // insert into readinglist table
+    await testHelper.insertIntoReadingList();
+  });
+
+  // returns a 200 OK & user is returned as JSON
   test("returns a 200 OK & user is returned as JSON", async () => {
     // set userId to 1
     const userId = 1;
     // send a get request to /api/users/:id
     await api.get(`/api/users/${userId}`).expect(200);
   });
+
   // shows blogs that the user added to their reading list
   test("shows the blogs they added to their reading list", async () => {
-    // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getBlogById(1);
-    // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getUserById(1);
-    // User 1 adds blog 1 to their reading list
-    await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
+    // get first user from database
+    const user = await testHelper.getFirstUser();
 
     // send a get request to /api/users/:id
-    const res = await api.get(`/api/users/${userId}`);
-    // expect res.body.readings to include the first blog in the database
-    expect(res.body.readings[0]).toEqual(
-      expect.objectContaining(data.blogs[0])
-    );
+    const res = await api.get(`/api/users/${user.id}`);
+    // log res.body as a json string
+    // console.log("res.body", JSON.stringify(res.body));
+    // expect res.body.readings to have length of data.blogs.length - 1
+    expect(res.body.readings).toHaveLength(data.blogs.length);
   });
-  // each blog shows info about the reading list it belongs to
-  test.only("each blog shows info about the reading list it belongs to", async () => {
-    // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getBlogById(1);
-    // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getUserById(1);
-    // User 1 adds blog 1 to their reading list
-    await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
 
+  // each blog shows info about the reading list it belongs to
+  test("each blog shows info about the reading list it belongs to", async () => {
+    // get first user from database
+    const user = await testHelper.getFirstUser();
     // declare readingListObj with default values: id & read
     const readingListObj = {
       id: expect.any(Number),
       read: false,
     };
-    // send a get request to /api/users/:id
-    const res = await api.get(`/api/users/${userId}`);
+    // get first user info
+    const res = await api.get(`/api/users/${user.id}`);
     // expect res.body.readings[0].readinglist to include readingListObj
     expect(res.body.readings[0].readinglist).toEqual(
       expect.objectContaining(readingListObj)
     );
   });
+  // with query string read=true/flase, returns only blogs that are read/unread
+  describe("?read=true/false", () => {
+    test("returns only blogs that are read", async () => {
+      // get the first user in the database
+      const firtUser = await testHelper.getFirstUser();
+      const user = data.users.find((user) => user.username === firtUser.username);
+      // Logins as user 1
+      const loginRes = await api
+        .post("/api/login")
+        .send(user)
+        .expect(200);
+      // log loginRes.body as json string
+      // console.log("loginRes.body", JSON.stringify(loginRes.body, null, 2));
+      // Get first record of ReadingList
+      const readingList = await testHelper.getFirstReadingList();
+      // log readingList 
+      // console.log("readingList", readingList);
+      // Update the first readinglist record to be read
+      const updateRes = await api
+        .put(`/api/readinglists/${readingList.id}`)
+        .auth(loginRes.body.token, { type: "bearer" })
+        .send({ read: true })
+        .expect(200);
+      // log updateRes.body as json string
+      // console.log("updateRes.body", JSON.stringify(updateRes.body, null, 2));
+      
+      // // Get user info who updated the reading list with query string read=true
+      const res = await api.get(`/api/users/${updateRes.body.userId}?read=true`);
+      // log res.body as json string
+      // console.log("res.body", JSON.stringify(res.body, null, 2));
+
+      // expect res.body.readings to have length of 1
+      expect(res.body.readings).toHaveLength(1);
+      // & include only the first blog with readinglist.read: true in the database
+      expect(res.body.readings[0].readinglist).toEqual(
+        expect.objectContaining({
+          read: true,
+        })
+      );
+    });
+
+    test("returns only blogs that are unread", async () => {
+      // get first user from database
+      const user = await testHelper.getFirstUser();
+      // get info of the first user with readinglist: read=true
+      const res = await api.get(`/api/users/${user.id}?read=false`);
+      // log res.body as json string
+      // console.log("res.body", JSON.stringify(res.body, null, 2));
+      // expect res.body.readings to have length of data.blogs.length - 1
+      expect(res.body.readings).toHaveLength(data.blogs.length);
+    });
+  });
 });
 
-describe("user creation validators", () => {
+describe("POST /api/users", () => {
   test("successfully create a new user with status code 201", async () => {
     await api.post("/api/users").send(data.users[1]).expect(201);
   });

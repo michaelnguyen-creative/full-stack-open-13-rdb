@@ -17,6 +17,14 @@ userRouter.get('/', async (req, res) => {
 
 // Get single user route by id
 userRouter.get('/:id', async (req, res) => {
+  // where object is used to filter the results
+  const where = {}
+  // if query string is present
+  if (req.query?.read) {
+    // where object is updated to filter by read status
+    where.read = req.query.read === 'true' // convert string to boolean
+  }
+
   // Find user by id
   const user = await User.findByPk(req.params?.id, {
     // include reading list of blogs as readings
@@ -27,7 +35,8 @@ userRouter.get('/:id', async (req, res) => {
         exclude: ['id', 'userId', 'createdAt', 'updatedAt']
       },
       through: {
-        attributes: ['id', 'read']
+        attributes: ['id', 'read'],
+        where,
       },
   },
     // exclude id & passwordHash & timestamp from user object
