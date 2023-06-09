@@ -1,4 +1,4 @@
-const { sequelize } = require('../init')
+const { sequelize } = require('../../utils/connectPostgres')
 const { DataTypes, Model } = require('sequelize')
 
 class User extends Model {}
