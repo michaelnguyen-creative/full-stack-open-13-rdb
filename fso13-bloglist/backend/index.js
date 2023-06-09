@@ -2,18 +2,14 @@ const http = require('http')
 
 const app = require('./app')
 const config = require('./utils/config')
-const logger = require('./utils/logger')
-const { connectToMongo } = require('./mongo/init')
-const { connectToPostgres } = require('./postgres/init')
+const { connectToPostgres } = require('./utils/connectPostgres')
 
 const server = http.createServer(app)
 
 const startServer = async () => {
   await connectToPostgres()
-  await connectToMongo()
-
   server.listen(config.PORT, () => {
-    logger.info(`Server is running on port ${config.PORT}`)
+    console.log(`Server is running on port ${config.PORT}`)
   })
 }
 
