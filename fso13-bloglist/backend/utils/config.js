@@ -7,12 +7,10 @@ if (process.env.NODE_ENV !== 'production') {
 //   require('dotenv').config({ path: process.env.BACKEND_SECRETS_FILE })
 // }
 
-let MONGODB_URI = process.env.MONGODB_URI || undefined
-
 const DATABASE_URL = process.env.NODE_ENV !== 'production'
   ? process.env.DATABASE_URL_LOCAL
   : process.env.DATABASE_URL
 
 const PORT = process.env.PORT || 8080
 
-module.exports = { PORT, MONGODB_URI, DATABASE_URL }
+module.exports = { PORT, DATABASE_URL }

@@ -8,6 +8,7 @@
     "dev": "nodemon index.js",
     "lint": "eslint .",
     "test": "jest --watchAll",
+    "test:ci": "jest --watchAll=false --coverage",
     "connect:postgres": "fly proxy 15432:5432 -a fso13-bloglist-backend-db"
   },
   "author": "Michael Nguyen",
@@ -19,8 +20,6 @@
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.8.2",
-    "mongoose-unique-validator": "^3.1.0",
     "pg": "^8.10.0",
     "sequelize": "^6.31.1",
     "umzug": "^3.2.1"

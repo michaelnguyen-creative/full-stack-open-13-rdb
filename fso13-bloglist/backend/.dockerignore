@@ -1,3 +1,16 @@
 node_modules/
-.env
+README.md
+# ignore dockerfile
+Dockerfile
+
+# Ignore tests
+**/*.test.js
+
+# Ignore config files
+\.*
+*.config.*
+*.toml|yaml|yml
+
+# Ignore dev files
+command.sql
 cli.js

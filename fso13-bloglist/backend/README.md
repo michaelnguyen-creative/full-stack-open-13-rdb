@@ -1,3 +1,4 @@
+Backend app deployed at https://fly.io/apps/fso13-bloglist-backend
 
 // which backend features (services) require authentication (user login) and which do not?
 // 1. login

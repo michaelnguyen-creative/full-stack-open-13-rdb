@@ -9,7 +9,7 @@ const sequelize = new Sequelize(config.DATABASE_URL);
 const runMigrations = async () => {
   const umzug = new Umzug({
     migrations: {
-      glob: path.join(__dirname, "migrations", "*.js"),
+      glob: path.join(__dirname, "../postgres/migrations", "*.js"),
     },
     context: sequelize.getQueryInterface(),
     storage: new SequelizeStorage({ sequelize, tableName: "migrations" }),
@@ -33,7 +33,7 @@ const connectToPostgres = async () => {
     } else {
       await sequelize.sync({ alter: true, force: true });
       console.log("Postgres models synced");
-    } 
+    }
   } catch (error) {
     console.log("Postgres connection error:", error.message);
     return process.exit(1);

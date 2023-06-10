@@ -1,5 +1,4 @@
 const http = require('http')
-
 const app = require('./app')
 const config = require('./utils/config')
 const { connectToPostgres } = require('./utils/connectPostgres')

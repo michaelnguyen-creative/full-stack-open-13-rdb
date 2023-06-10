@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { User } = require('../models')
 // require SessionManager
-const SessionManager = require('../utils/sessionManager')
+const SessionManager = require('./sessionManager')
 
 const tokenExtractor = (req, _res, next) => {
   const authz = req.get('authorization')
@@ -57,7 +57,6 @@ const errorHandler = (error, req, res, next) => {
   if (
     [
       'SequelizeValidationError',
-      'BadUserInputError',
       'SequelizeDatabaseError',
     ].includes(error.name)
   ) {
