@@ -5,7 +5,7 @@ const api = supertest(app);
 const testHelper = require("../utils/testHelper");
 
 const data = require("../postgres/seed");
-const { sequelize, connectToPostgres } = require("../postgres/init");
+const { sequelize, connectToPostgres } = require("../utils/connectPostgres");
 
 beforeAll(async () => {
   await connectToPostgres();
@@ -17,10 +17,12 @@ beforeEach(async () => {
 
 describe("GET /api/users", () => {
   test("returns a 200 OK & users are returned as JSON", async () => {
-    await api
+    const res = await api
       .get("/api/users")
       .expect(200)
       .expect("Content-Type", /application\/json/);
+    // log res.body
+    // console.log("res.body", res.body);
   });
   test("each user shows the blogs they created", async () => {
     const res = await api.get("/api/users");
@@ -78,8 +80,8 @@ describe("GET /api/users/:id", () => {
   describe("?read=true/false", () => {
     test("returns only blogs that are read", async () => {
       // get the first user in the database
-      const firtUser = await testHelper.getFirstUser();
-      const user = data.users.find((user) => user.username === firtUser.username);
+      const firstUser = await testHelper.getFirstUser();
+      const user = data.users.find((user) => user.username === firstUser.username);
       // Logins as user 1
       const loginRes = await api
         .post("/api/login")

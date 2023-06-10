@@ -1,14 +1,10 @@
 const blogsRouter = require('express').Router()
 const { Op } = require('sequelize')
-const { Blog, User } = require('../postgres/models')
-const { AuthenticationError } = require('../utils/error')
-
+const { Blog, User } = require('../models')
+const middleware = require('../utils/middleware')
 
 // This code block defines a GET endpoint for retrieving blogs.
 // The endpoint accepts a query parameter 'search' which is used to filter the blogs by title or author.
-// The blogs are sorted in descending order by the number of likes.
-// The endpoint returns a JSON response containing an array of blogs.
-// Each blog object contains the blog's title, author, url, likes, year, and the name of the user who created the blog.
 blogsRouter.get('/', async (req, res) => {
   let where = {}
   if (req.query?.search) {
@@ -31,15 +27,15 @@ blogsRouter.get('/', async (req, res) => {
   res.json(blogs)
 })
 
+// All routes below this middleware require a valid session
+blogsRouter.use(middleware.sessionValidator)
 
 
-// This code block defines a POST endpoint for creating a new blog.
-// The endpoint accepts a JSON request body containing the blog's title, author, url, likes, and year.
-// The endpoint requires authentication, and the user who created the blog is determined from the JWT token.
-// The endpoint returns a JSON response containing the newly created blog object.
 blogsRouter.post('/', async (req, res) => {
   const { title, author, url, likes, year } = req.body
-  if (!req.user) throw new AuthenticationError('Invalid user')
+  if (!req.user) {
+    return res.status(401).json({ error: 'invalid user' })
+  }
 
   const blog = Blog.build({
     title,
@@ -47,7 +43,7 @@ blogsRouter.post('/', async (req, res) => {
     url,
     likes,
     year,
-    UserId: req.user.id,
+    userId: req.user.id,
   })
   const newBlog = await blog.save()
 
@@ -61,14 +57,17 @@ const findBlog = async (req, _res, next) => {
 }
 
 blogsRouter.delete('/:id', findBlog, async (req, res) => {
-  if (!req.token || !req.user) {
-    throw new AuthenticationError('Invalid token or user')
+  if (!req.user) {
+    return res.status(401).json({ error: 'invalid user' })
   }
   await req.blog.destroy()
   res.status(204).end()
 })
 
 blogsRouter.put('/:id', findBlog, async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'invalid user' })
+  }
   if (req.blog) {
     req.blog.likes = req.body?.likes
     await req.blog.save()

@@ -3,7 +3,7 @@ const app = require('../app')
 const api = supertest(app)
 
 const testHelper = require('../utils/testHelper')
-const { sequelize, connectToPostgres } = require('../postgres/init')
+const { sequelize, connectToPostgres } = require('../utils/connectPostgres')
 
 beforeAll(async () => {
     await connectToPostgres()

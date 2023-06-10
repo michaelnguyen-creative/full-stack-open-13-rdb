@@ -1,6 +1,7 @@
 // create new router for reading list
 const readingListRouter = require('express').Router();
-const { ReadingList } = require('../postgres/models');
+const { ReadingList } = require('../models');
+const middleware = require('../utils/middleware');
 
 // add a new blog to reading list
 readingListRouter.post('/', async (req, res) => {
@@ -10,6 +11,9 @@ readingListRouter.post('/', async (req, res) => {
     // return reading list
     res.status(201).json(readingList);
 })
+
+// All routes below this middleware require a valid session
+readingListRouter.use(middleware.sessionValidator)
 
 // update read status of a blog in a user's reading list
 readingListRouter.put('/:id', async (req, res) => {

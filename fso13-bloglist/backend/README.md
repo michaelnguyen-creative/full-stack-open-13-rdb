@@ -42,3 +42,75 @@
 // Visualize the system? (draw a diagram)
 How each parts fit together?
 
+
+// Authentication mechanism: 
+// Token-based authentication with server-side session
+// server will store the session data (login token) in a postgresql database
+
+
+// I decided to build the fullstack app with MVC architecture
+// MVC > traditional 3-tier architecture (=> n-tier) > distributed computing
+
+// MVC architecture
+// 1. Model: data layer
+// 2. View: presentation layer
+// 3. Controller: logic layer
+
+// 3-tier architecture
+// 1. Presentation tier
+// 2. Application tier
+// 3. Data tier
+
+// n-tier architecture
+// 1. Presentation tier
+// 2. Application tier
+// 3. Data tier
+// 4. Business logic tier
+// 5. Integration tier
+// 6. Security tier
+// 7. Management tier
+// 8. Development tier
+// 9. Testing tier
+// 10. Deployment tier
+// 11. Network tier
+// 12. User interface tier
+// 13. Client tier
+// 14. Server tier
+// 15. Storage tier
+// 16. Compute tier
+// 17. Database tier
+// 18. Application tier
+// 19. Web tier
+// 20. Mobile tier ....
+
+// Distributed computing
+// 1. Client-server model
+// 2. Peer-to-peer model
+// 3. 3-tier architecture
+// 4. n-tier architecture
+// 5. Cloud computing
+// 6. Grid computing
+// 7. Cluster computing
+// 8. Utility computing
+// 9. Fog computing
+// 10. Edge computing
+// 11. Mobile computing
+// 12. Social computing
+// 13. Ubiquitous computing
+
+// 3-tier architecture vs n-tier architecture
+// 3-tier architecture:
+// 1. Presentation tier
+// 2. Application tier
+// 3. Data tier
+
+// n-tier architecture:
+// 1. Presentation tier
+// 2. Application tier
+// 3. Data tier
+// 4. Business logic tier
+...
+
+
+
+

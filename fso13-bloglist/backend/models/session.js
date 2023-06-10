@@ -12,6 +12,10 @@ module.exports = Session.init(
       allowNull: false,
       primaryKey: true,
     },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    }
   },
   {
     sequelize,

@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { Blog, User, ReadingList } = require("../postgres/models");
+const { Blog, User, ReadingList, Session } = require("../models");
 const data = require("../postgres/seed");
 
 const getAllBlogs = async () => Blog.findAll();
@@ -8,6 +8,8 @@ const getUserById = async (id) => User.findByPk(id);
 const getBlogById = async (id) => Blog.findByPk(id);
 // implement getReadingById
 const getReadingById = async (id) => ReadingList.findByPk(id);
+// implement getTokenByToken(token)
+const getTokenByToken = async (token) => Session.findByPk(token);
 // implement getFirtUser from db
 const getFirstUser = async () => User.findOne();
 // implement getFirtBlog from db
@@ -70,6 +72,7 @@ module.exports = {
   getUserById,
   getBlogById,
   getReadingById,
+  getTokenByToken,
   getFirstUser,
   getFirstBlog,
   getFirstReadingList,

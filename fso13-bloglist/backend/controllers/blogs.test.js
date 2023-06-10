@@ -4,7 +4,7 @@ const api = supertest(app)
 
 const helper = require('../utils/testHelper')
 const seedData = require('../postgres/seed')
-const { sequelize, connectToPostgres } = require('../postgres/init')
+const { sequelize, connectToPostgres } = require('../utils/connectPostgres')
 
 beforeAll(async () => {
   await connectToPostgres()
@@ -164,7 +164,14 @@ describe('UPDATE /api/blogs/:id', () => {
     const validFirstId = blogs[0].id
     const likesToUpdate = { likes: 40 }
 
-    await api.put(`/api/blogs/${validFirstId}`).send(likesToUpdate).expect(200)
+    // login first
+    const respond = await api.post('/api/login').send(seedData.users[0])
+    // update likes
+    await api
+      .put(`/api/blogs/${validFirstId}`)
+      .auth(respond.body.token, { type: 'bearer' })
+      .send(likesToUpdate)
+      .expect(200)
   })
 })
 

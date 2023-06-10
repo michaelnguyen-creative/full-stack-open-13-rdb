@@ -4,7 +4,7 @@ const api = supertest(app);
 
 const testHelper = require("../utils/testHelper");
 const data = require("../postgres/seed");
-const { sequelize, connectToPostgres } = require("../postgres/init");
+const { sequelize, connectToPostgres } = require("../utils/connectPostgres");
 
 beforeAll(async () => {
   await connectToPostgres();
@@ -33,14 +33,12 @@ describe("POST /api/readingList", () => {
 // Updating read status of a blog in a user's reading list
 // PUT /api/readinglists/:id
 describe("PUT /api/readinglists/:id", () => {
+  // before each test, insert into readinglist table
+  beforeEach(async () => {
+    // insert into readinglist table
+    await testHelper.insertIntoReadingList();
+  });
   test("returns 200 & updated read status", async () => {
-    // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getFirstBlog();
-    // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getFirstUser();
-    // Making post request to /api/readingList with blogId and userId
-    await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
-
     // user login as the first user in the database
     const loginRes = await api
       .post("/api/login")
@@ -60,13 +58,6 @@ describe("PUT /api/readinglists/:id", () => {
   });
 
   test("returns 401 & error message if user is not logged in", async () => {
-    // Get blogId from the first blog in the database
-    const { id: blogId } = await testHelper.getFirstBlog()
-    // Get userId from the first user in the database
-    const { id: userId } = await testHelper.getFirstUser()
-    // Making post request to /api/readingList with blogId and userId
-    await api.post("/api/readinglists").send({ blogId, userId }).expect(201);
-
     // Get readingId from the first reading in the database
     const { id: readingId } = await testHelper.getFirstReadingList();
     // Making put request to /api/readinglists/:id with readingId
@@ -77,7 +68,7 @@ describe("PUT /api/readinglists/:id", () => {
 
     // Check that error message is returned
     expect(updatedRes.body.error).toBe(
-        "You must be logged in to update read status of a blog in your reading list"
+        "token missing"
     );
   });
 });
