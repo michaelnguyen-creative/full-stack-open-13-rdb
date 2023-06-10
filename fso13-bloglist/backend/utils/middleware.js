@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
-const { User } = require('../postgres/models')
+const { User } = require('../models')
+// require SessionManager
+const SessionManager = require('../utils/sessionManager')
 
 const tokenExtractor = (req, _res, next) => {
   const authz = req.get('authorization')
@@ -14,17 +16,36 @@ const tokenExtractor = (req, _res, next) => {
   return next()
 }
 
-const userExtractor = async (req, res, next) => {
-  if (!req.token) return next()
-
-  const decoded = jwt.verify(req.token, process.env.JWT_SECRET)
-  const returnedUser = await User.findByPk(decoded.id)
-  if (returnedUser.id === decoded.id) {
-    req.user = returnedUser
-  } else {
-    req.user = null
+// sessionValidator middleware
+const sessionValidator = async (req, res, next) => {
+  // check if token exists
+  if (!req.token) {
+    return res.status(401).json({ error: 'token missing' })
   }
-  return next()
+  // validate token (including its expiration duration)
+  const decoded = jwt.verify(req.token, process.env.JWT_SECRET)
+  const session = await SessionManager.findSession(req.token)
+  // Three conditions to check:
+  // 1. session exists
+  // 2. session user id matches the user id in the request params
+  // 3. session is not expired
+  const userMatched = session && session.userId === decoded.userId
+  const sessionExpired = session && session.expiresAt < Date.now()
+
+  if (!userMatched) {
+    return res.status(401).json({ error: 'invalid token' })
+  } else if (sessionExpired) {
+    // remove token from request & delete session
+    req.token = null
+    await SessionManager.deleteSession(req.token)
+    return res.status(401).json({ error: 'token expired' })
+  } else {
+    // find user by id
+    const user = await User.findByPk(decoded.userId)
+    // set req.user to the user object
+    req.user = user
+    return next()
+  }
 }
 
 const unknownEndpoint = (_req, res, next) => {
@@ -59,6 +80,6 @@ const errorHandler = (error, req, res, next) => {
 module.exports = {
   unknownEndpoint,
   tokenExtractor,
-  userExtractor,
+  sessionValidator,
   errorHandler,
 }
